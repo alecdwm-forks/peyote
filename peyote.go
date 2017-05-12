@@ -9,9 +9,9 @@ import "strings"
 func main(){
   username := os.Getenv("USER")
   hostname := "z"
-  dirname := strings.Replace(dir, homedir, "~", 1)
-  homedir := os.Getenv("HOME")
   dir, err := os.Getwd()
+  homedir := os.Getenv("HOME")
+  dirname := strings.Replace(dir, homedir, "~", 1)
   if err != nil {
     log.Fatal(err)
 
