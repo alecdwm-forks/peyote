@@ -10,7 +10,7 @@ import "strconv"
 func main(){
   returncode := os.Args[1]
   username := os.Getenv("USER")
-  hostname := "acid"
+  hostname, err := os.Hostname()
   dir, err := os.Getwd()
   homedir := os.Getenv("HOME")
   dirname := strings.Replace(dir, homedir, "~", 1)
