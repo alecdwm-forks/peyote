@@ -1,21 +1,31 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 )
 
 const (
-	promptTextColor            = "254"
-	promptUserColor            = "23"
-	promptRootColor            = "88"
-	promptDirColor             = "241"
-	promptErrorTextColor       = "203"
-	promptErrorBackgroundColor = "236"
-	shortDirName               = true
+	promptTextColor                = "254"
+	promptUserBackgroundColor      = "23"
+	promptRootBackgroundColor      = "88"
+	promptDirectoryBackgroundColor = "241"
+	promptGitTextColor             = "2"
+	promptGitBackgroundColor       = "16"
+	promptErrorTextColor           = "203"
+	promptErrorBackgroundColor     = "236"
+
+	showUserAndHost    = true
+	showDirectoryName  = true
+	shortDirectoryName = true
+	showGitStatus      = true
+	showReturnCode     = true
 )
 
 func main() {
@@ -34,9 +44,9 @@ func main() {
 
 	var usercolor string
 	if euidnum > 0 {
-		usercolor = promptUserColor
+		usercolor = promptUserBackgroundColor
 	} else {
-		usercolor = promptRootColor
+		usercolor = promptRootBackgroundColor
 	}
 
 	hostname, err := os.Hostname()
@@ -46,7 +56,7 @@ func main() {
 	}
 	homedir := os.Getenv("HOME")
 	dirname := strings.Replace(dir, homedir, "~", 1)
-	if shortDirName && strings.Count(dirname, "/") > 1 {
+	if shortDirectoryName && strings.Count(dirname, "/") > 1 {
 		dirname = dirname[strings.LastIndex(dirname, "/")+1:]
 	}
 
@@ -54,20 +64,45 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if returncodeint > 0 {
-		prompt := NewPrompt(
-			[]string{promptTextColor, usercolor, fmt.Sprintf(" %s@%s ", username, hostname)},
-			[]string{promptTextColor, promptDirColor, fmt.Sprintf(" %s ", dirname)},
-			[]string{promptErrorTextColor, promptErrorBackgroundColor, fmt.Sprintf(" %s ", returncode)},
-		)
-		fmt.Println(prompt.ToString())
-	} else {
-		prompt := NewPrompt(
-			[]string{promptTextColor, usercolor, fmt.Sprintf(" %s@%s ", username, hostname)},
-			[]string{promptTextColor, promptDirColor, fmt.Sprintf(" %s ", dirname)},
-		)
-		fmt.Println(prompt.ToString())
+
+	prompt := NewPrompt()
+	if showUserAndHost {
+		prompt.AddSegment(NewSegment(promptTextColor, usercolor, fmt.Sprintf(" %s@%s ", username, hostname)))
 	}
+	if showDirectoryName {
+		prompt.AddSegment(NewSegment(promptTextColor, promptDirectoryBackgroundColor, fmt.Sprintf(" %s ", dirname)))
+	}
+	if showGitStatus {
+		directoryIsGitRepo := true
+		gitStatus := exec.Command("git", "status")
+		output, err := gitStatus.CombinedOutput()
+		if err != nil {
+			directoryIsGitRepo = false
+		}
+		if directoryIsGitRepo {
+			gitBranch := ""
+			workingTreeClean := "!"
+			scanner := bufio.NewScanner(bytes.NewReader(output))
+			for scanner.Scan() {
+				text := scanner.Text()
+				if strings.HasPrefix(text, "On branch ") {
+					gitBranch = strings.Split(text, "On branch ")[1]
+				}
+				if strings.HasPrefix(text, "nothing to commit, working tree clean") {
+					workingTreeClean = ""
+				}
+			}
+			if err := scanner.Err(); err != nil {
+				log.Fatal(err)
+			}
+			prompt.AddSegment(NewSegment(promptGitTextColor, promptGitBackgroundColor, fmt.Sprintf(" %[1]s%[2]s ", gitBranch, workingTreeClean)))
+		}
+	}
+	if showReturnCode && returncodeint > 0 {
+		prompt.AddSegment(NewSegment(promptErrorTextColor, promptErrorBackgroundColor, fmt.Sprintf(" %s ", returncode)))
+	}
+
+	fmt.Println(prompt.ToString())
 }
 
 type Prompt struct {
@@ -82,6 +117,11 @@ func NewPrompt(segmentsParams ...[]string) Prompt {
 	return Prompt{
 		Segments: segments,
 	}
+}
+
+func (p *Prompt) AddSegment(segment Segment) *Prompt {
+	p.Segments = append(p.Segments, segment)
+	return p
 }
 
 func (p *Prompt) ToString() string {
