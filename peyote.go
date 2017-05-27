@@ -15,6 +15,7 @@ const (
 	promptDirColor             = "241"
 	promptErrorTextColor       = "203"
 	promptErrorBackgroundColor = "236"
+	shortDirName               = true
 )
 
 func main() {
@@ -45,6 +46,9 @@ func main() {
 	}
 	homedir := os.Getenv("HOME")
 	dirname := strings.Replace(dir, homedir, "~", 1)
+	if shortDirName && strings.Count(dirname, "/") > 1 {
+		dirname = dirname[strings.LastIndex(dirname, "/")+1:]
+	}
 
 	returncodeint, err := strconv.Atoi(returncode)
 	if err != nil {
