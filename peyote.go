@@ -80,13 +80,16 @@ func main() {
 			directoryIsGitRepo = false
 		}
 		if directoryIsGitRepo {
-			gitBranch := ""
+			gitHEAD := ""
 			workingTreeClean := "!"
 			scanner := bufio.NewScanner(bytes.NewReader(output))
 			for scanner.Scan() {
 				text := scanner.Text()
 				if strings.HasPrefix(text, "On branch ") {
-					gitBranch = strings.Split(text, "On branch ")[1]
+					gitHEAD = strings.Split(text, "On branch ")[1]
+				}
+				if strings.HasPrefix(text, "HEAD detached at ") {
+					gitHEAD = strings.Split(text, "HEAD detached at ")[1]
 				}
 				if strings.HasPrefix(text, "nothing to commit, working tree clean") {
 					workingTreeClean = ""
@@ -95,7 +98,7 @@ func main() {
 			if err := scanner.Err(); err != nil {
 				log.Fatal(err)
 			}
-			prompt.AddSegment(NewSegment(promptGitTextColor, promptGitBackgroundColor, fmt.Sprintf(" %[1]s%[2]s ", gitBranch, workingTreeClean)))
+			prompt.AddSegment(NewSegment(promptGitTextColor, promptGitBackgroundColor, fmt.Sprintf(" %[1]s%[2]s ", gitHEAD, workingTreeClean)))
 		}
 	}
 	if showReturnCode && returncodeint > 0 {
