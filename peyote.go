@@ -105,7 +105,8 @@ func main() {
 		}
 	}
 	if showReturnCode && returncodeint > 0 {
-		prompt.AddSegment(NewSegment(promptErrorTextColor, promptErrorBackgroundColor, fmt.Sprintf(" %s ", returncode)))
+		prompt.AddSegment(NewSegment(promptErrorTextColor, promptErrorBackgroundColor, ""))
+		prompt.AddSegment(NewSegment(promptErrorTextColor, promptErrorBackgroundColor, fmt.Sprintf(" %s ", returncode)))
 	}
 
 	fmt.Println(prompt.ToString())
@@ -161,6 +162,8 @@ func (s *Segment) ToString(nextBackgroundColor string) string {
 	var powerlineArrow string
 	if nextBackgroundColor == "" {
 		powerlineArrow = fmt.Sprintf("%%F{%[1]s}", s.BackgroundColor)
+	} else if nextBackgroundColor == s.BackgroundColor {
+		powerlineArrow = fmt.Sprintf("%%K{%[1]s}%%F{%[2]s}", nextBackgroundColor, s.TextColor)
 	} else {
 		powerlineArrow = fmt.Sprintf("%%K{%[1]s}%%F{%[2]s}", nextBackgroundColor, s.BackgroundColor)
 	}
