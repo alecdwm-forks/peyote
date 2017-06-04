@@ -17,7 +17,7 @@ const (
 	promptRootBackgroundColor      = "88"
 	promptDirectoryBackgroundColor = "241"
 	promptGitTextColor             = "2"
-	promptGitBackgroundColor       = "16"
+	promptGitBackgroundColor       = "238"
 	promptErrorTextColor           = "203"
 	promptErrorBackgroundColor     = "236"
 
