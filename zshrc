@@ -9,7 +9,9 @@
 # set peyote installation location (no need to suffix with /)
 peyote_home="$HOME/git/peyote"
 
-# set path to zsh-syntax-highlighting file
+# Set path to zsh-syntax-highlighting file
+# (by default assumed to be in ~/git/zsh-syntax-highlighting)
+# You can get a copy from: https://github.com/zsh-users/zsh-syntax-highlighting
 zsh_syntax_highlighting_file="$HOME/git/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
 _peyote () {
