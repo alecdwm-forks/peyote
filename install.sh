@@ -44,7 +44,7 @@ cd
 
 ln -s .peyote/zshrc .zshrc || bailout 'Symbolic link ~/.zshrc exists, I will not touch this for you.'
 
-msg "setup complete."
+msg "Setup complete. Keep in mind you have to build the peyote binary (go build peyote.go)"
 
 
 
