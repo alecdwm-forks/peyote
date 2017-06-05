@@ -19,6 +19,8 @@ _peyote () {
 if [[ ! "$TERM" == linux ]]; then;
 	if [[ "$TERM" != "dumb" ]]; then
 		export PROMPT="$($peyote_home/peyote $1 $EUID 2>/dev/null)"
+		export RPROMPT="%F{237}"$'\ue0b2'"%K{237}%F{248} $(date '+%H:%M:%S') "
+                export ZLE_RPROMPT_INDENT=0
 	else
 		export PROMPT="[zsh] $ "
 	fi
@@ -73,7 +75,15 @@ ls_options="--color=auto --group-directories-first -F"
 # ls_options="-F"
 
 dircolors_command="dircolors"
-ls_command="ls"
+
+case "$(uname)" in
+  FreeBSD)
+    ls_command="gls"
+  ;;
+  *)
+    ls_command="ls"
+  ;
+esac
 
 # enable ls colorization: 
 if [[ "$TERM" != "dumb" ]]; then
