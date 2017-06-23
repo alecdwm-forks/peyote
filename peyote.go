@@ -94,6 +94,9 @@ func main() {
 				if strings.HasPrefix(text, "HEAD detached from ") {
 					gitHEAD = strings.Split(text, "HEAD detached from ")[1]
 				}
+				if strings.HasPrefix(text, "rebase in progress; onto ") {
+					gitHEAD = strings.Split(text, "rebase in progress; onto ")[1]
+				}
 				if strings.HasPrefix(text, "nothing to commit, working tree clean") {
 					workingTreeClean = ""
 				}
